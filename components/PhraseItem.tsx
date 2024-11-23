@@ -22,7 +22,10 @@ const PhraseItem = React.memo(
         ]}
       >
         <Text style={styles.speaker}>{item.speaker}</Text>
-        <Text style={[styles.phrase, isHighlighted ? styles.highlight : null]}>
+        <Text
+          style={[styles.phrase, isHighlighted ? styles.highlight : null]}
+          testID="phrase"
+        >
           {item.text}
         </Text>
       </TouchableOpacity>

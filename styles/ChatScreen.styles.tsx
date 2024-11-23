@@ -3,6 +3,24 @@ import { StyleSheet } from "react-native";
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width: "100%",
+    backgroundColor: "#fff",
+  },
+  webWrapper: {
+    flex: 1,
+    maxHeight: "95%",
+    boxSizing: "border-box",
+    width: "100%",
+    maxWidth: 480,
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderStyle: "solid",
+    borderRadius: 10,
+  },
+  center: {
+    justifyContent: "center",
+    alignItems: "center",
   },
   header: {
     fontSize: 20,

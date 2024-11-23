@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   FlatList,
+  Platform,
   SafeAreaView,
   Text,
   TouchableOpacity,
@@ -21,6 +23,7 @@ const ChatScreen = () => {
     [metadata]
   );
 
+  const [isLoading, setIsLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentPhrase, setCurrentPhrase] = useState(0);
@@ -49,7 +52,9 @@ const ChatScreen = () => {
           AudioConfig.progressUpdateInterval
         );
       } catch (error) {
-        console.error("Error loading audio:", error);
+        console.error("Error loading audio");
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -161,42 +166,78 @@ const ChatScreen = () => {
     }
   };
 
+  if (isLoading) {
+    return (
+      <SafeAreaView style={[styles.container, styles.center]}>
+        <ActivityIndicator
+          testID="loading-screen"
+          color="#007BFF"
+          size="large"
+        />
+      </SafeAreaView>
+    );
+  }
+
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.header}>Chat TTS</Text>
-      <FlatList
-        data={interleavedPhrases}
-        renderItem={({ item, index }) => (
-          <PhraseItem
-            item={item}
-            isHighlighted={currentPhrase === index}
-            onPress={() => jumpToPhrase(index)}
-          />
-        )}
-        keyExtractor={(_, index) => index.toString()}
-        contentContainerStyle={styles.phraseList}
-      />
-      <View style={styles.footer}>
-        <Text style={styles.progress}>
-          {(progress / 1000).toFixed(0)} s / {(totalDuration / 1000).toFixed(0)}{" "}
-          s
-        </Text>
-        <View style={styles.controls}>
-          <TouchableOpacity onPress={rewind}>
-            <Text style={styles.controlButton}>⏮</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={
-              isPlaying ? pauseAudio : isFinished ? repeatPlayback : playAudio
-            }
-          >
-            <Text style={styles.controlButton}>
-              {isPlaying ? "⏸" : isFinished ? "↺" : "▶️"}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={forward}>
-            <Text style={styles.controlButton}>⏭</Text>
-          </TouchableOpacity>
+    <SafeAreaView
+      style={[
+        styles.center,
+        styles.container,
+      ]}
+    >
+      <View
+        style={[
+          styles.container,
+          ...(Platform.OS === "web" ? [styles.webWrapper] : []),
+        ]}
+      >
+        <Text style={styles.header}>Chat TTS</Text>
+        <FlatList
+          data={interleavedPhrases}
+          testID="flatlist-phrases"
+          renderItem={({ item, index }) => (
+            <PhraseItem
+              item={item}
+              isHighlighted={currentPhrase === index}
+              onPress={() => jumpToPhrase(index)}
+            />
+          )}
+          keyExtractor={(_, index) => index.toString()}
+          contentContainerStyle={styles.phraseList}
+        />
+        <View style={styles.footer}>
+          <Text style={styles.progress} testID="progress">
+            {(progress / 1000).toFixed(0)} s /{" "}
+            {(totalDuration / 1000).toFixed(0)} s
+          </Text>
+          <View style={styles.controls}>
+            <TouchableOpacity onPress={rewind} testID="button-rewind">
+              <Text style={styles.controlButton}>⏮</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={
+                isPlaying ? pauseAudio : isFinished ? repeatPlayback : playAudio
+              }
+              testID="button-central-handler"
+            >
+              {isPlaying ? (
+                <Text testID="button-pause" style={styles.controlButton}>
+                  ⏸
+                </Text>
+              ) : isFinished ? (
+                <Text testID="button-repeat" style={styles.controlButton}>
+                  ↺
+                </Text>
+              ) : (
+                <Text testID="button-play" style={styles.controlButton}>
+                  ▶️
+                </Text>
+              )}
+            </TouchableOpacity>
+            <TouchableOpacity onPress={forward} testID="button-forward">
+              <Text style={styles.controlButton}>⏭</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </SafeAreaView>
